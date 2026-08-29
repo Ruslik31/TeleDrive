@@ -61,4 +61,5 @@ object PreferenceKeys {
     val TRANSFER_RETRY_COUNT = intPreferencesKey("transfer_retry_count")
     val ALLOW_METERED_TRANSFERS = booleanPreferencesKey("allow_metered_transfers")
     val DEBUG_LOGGING = booleanPreferencesKey("debug_logging")
+    val LANGUAGE = stringPreferencesKey("language_tag")
 }

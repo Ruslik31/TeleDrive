@@ -71,6 +71,22 @@ class TeleDriveApplication : Application(), Configuration.Provider, SingletonIma
     override fun newImageLoader(context: PlatformContext): ImageLoader =
         imageLoaderProvider.get()
 
+    private fun applyLanguage(tag: String?) {
+        try {
+            if (tag.isNullOrBlank()) {
+                // Use system default: nothing to change
+                return
+            }
+            val locale = java.util.Locale.forLanguageTag(tag)
+            java.util.Locale.setDefault(locale)
+            val config = resources.configuration
+            config.setLocale(locale)
+            resources.updateConfiguration(config, resources.displayMetrics)
+        } catch (t: Throwable) {
+            // ignore
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         appNotifications.createChannels()
@@ -81,6 +97,12 @@ class TeleDriveApplication : Application(), Configuration.Provider, SingletonIma
                 .map { it.debugLogging }
                 .distinctUntilChanged()
                 .onEach { SafeLog.verbose = it || BuildConfig.DEBUG }
+                .launchIn(applicationScope)
+            // Apply language setting (empty = system default)
+            settingsRepository.preferences
+                .map { it.languageTag }
+                .distinctUntilChanged()
+                .onEach { applyLanguage(it) }
                 .launchIn(applicationScope)
             transferRepository.recoverOrphanedTransfers()
             publishScheduler.kick()

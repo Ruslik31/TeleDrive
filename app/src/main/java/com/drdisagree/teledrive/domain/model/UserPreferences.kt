@@ -55,4 +55,6 @@ data class UserPreferences(
 
     val proxyEnabled: Boolean = false,
     val activeProxyId: String = ""
+,
+    val languageTag: String = ""
 )

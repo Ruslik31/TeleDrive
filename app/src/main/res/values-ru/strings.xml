@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TeleDrive</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- Settings: appearance -->
+    <string name="settings_theme">Тема</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_language_system">Системный</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_ru">Русский</string>
+
+    <!-- Common -->
+    <string name="common_cancel">Отмена</string>
+</resources>

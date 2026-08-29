@@ -839,6 +839,36 @@ private fun AppearanceSection(state: SettingsUiState, viewModel: SettingsViewMod
             )
         }
         add {
+            var showLanguageDialog by remember { mutableStateOf(false) }
+            if (showLanguageDialog) {
+                ChoiceDialog(
+                    title = stringResource(R.string.settings_language),
+                    options = listOf(
+                        Pair("", stringResource(R.string.settings_language_system)),
+                        Pair("en", stringResource(R.string.settings_language_en)),
+                        Pair("ru", stringResource(R.string.settings_language_ru))
+                    ),
+                    selected = prefs.languageTag,
+                    onSelect = { lang ->
+                        showLanguageDialog = false
+                        viewModel.update { it.copy(languageTag = lang) }
+                    },
+                    onDismiss = { showLanguageDialog = false }
+                )
+            }
+
+            SettingsClickRow(
+                title = stringResource(R.string.settings_language),
+                subtitle = when (prefs.languageTag) {
+                    "" -> stringResource(R.string.settings_language_system)
+                    "ru" -> stringResource(R.string.settings_language_ru)
+                    "en" -> stringResource(R.string.settings_language_en)
+                    else -> prefs.languageTag
+                },
+                onClick = { showLanguageDialog = true }
+            )
+        }
+        add {
             SettingsSwitchRow(
                 title = stringResource(R.string.settings_recent_files),
                 subtitle = stringResource(R.string.settings_recent_files_subtitle),

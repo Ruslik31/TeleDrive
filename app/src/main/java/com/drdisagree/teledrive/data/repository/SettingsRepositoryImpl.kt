@@ -154,6 +154,8 @@ class SettingsRepositoryImpl @Inject constructor(
             allowMeteredTransfers = this[PreferenceKeys.ALLOW_METERED_TRANSFERS]
                 ?: defaults.allowMeteredTransfers,
             debugLogging = this[PreferenceKeys.DEBUG_LOGGING] ?: defaults.debugLogging
+            ,
+            languageTag = this[PreferenceKeys.LANGUAGE] ?: defaults.languageTag
         )
     }
 
@@ -203,6 +205,7 @@ class SettingsRepositoryImpl @Inject constructor(
         this[PreferenceKeys.TRANSFER_RETRY_COUNT] = prefs.transferRetryCount
         this[PreferenceKeys.ALLOW_METERED_TRANSFERS] = prefs.allowMeteredTransfers
         this[PreferenceKeys.DEBUG_LOGGING] = prefs.debugLogging
+        this[PreferenceKeys.LANGUAGE] = prefs.languageTag
     }
 
     private inline fun <reified T : Enum<T>> enumOrDefault(name: String?, default: T): T =
