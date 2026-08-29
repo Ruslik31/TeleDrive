@@ -27,8 +27,8 @@ jobs:
           keytool -genkeypair -v -keystore release.keystore -alias teledrive -storepass password -keypass password -dname "CN=TeleDrive, OU=Dev, O=TeleDrive, L=City, ST=State, C=US" -keyalg RSA -keysize 2048 -validity 10000
           ./gradlew :app:assembleRelease -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/release.keystore -Pandroid.injected.signing.store.password=password -Pandroid.injected.signing.key.alias=teledrive -Pandroid.injected.signing.key.password=password --no-daemon
 
-      - name: Create GitHub release and upload APKs
-        uses: ncipollo/release-action@v1
+      - name: Upload built APKs as artifacts
+        uses: actions/upload-artifact@v4
         with:
-          # upload all generated release APKs (including ABI-specific and universal)
-          files: app/build/outputs/apk/release/*.apk
+          name: release-apks
+          path: app/build/outputs/apk/release/*.apk
