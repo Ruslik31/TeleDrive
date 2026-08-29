@@ -9,3 +9,6 @@
 .cxx
 local.properties
 .kotlin
+# Generated artifacts and keys
+release.keystore
+release-artifacts/
