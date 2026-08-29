@@ -1,0 +1,34 @@
+name: Build and publish release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Generate keystore and build signed release APKs
+        run: |
+          # generate a temporary keystore (stored only during the workflow run)
+          keytool -genkeypair -v -keystore release.keystore -alias teledrive -storepass password -keypass password -dname "CN=TeleDrive, OU=Dev, O=TeleDrive, L=City, ST=State, C=US" -keyalg RSA -keysize 2048 -validity 10000
+          ./gradlew :app:assembleRelease -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/release.keystore -Pandroid.injected.signing.store.password=password -Pandroid.injected.signing.key.alias=teledrive -Pandroid.injected.signing.key.password=password --no-daemon
+
+      - name: Create GitHub release and upload APKs
+        uses: ncipollo/release-action@v1
+        with:
+          # upload all generated release APKs (including ABI-specific and universal)
+          files: app/build/outputs/apk/release/*.apk
