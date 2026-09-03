@@ -42,25 +42,29 @@ object RootUtil {
     suspend fun listDirectories(path: String): List<File> = withContext(Dispatchers.IO) {
         val dir = File(path)
         val javaFiles = runCatching { dir.listFiles() }.getOrNull()
-        if (javaFiles != null && javaFiles.isNotEmpty()) {
-            return@withContext javaFiles.filter { it.isDirectory }.sortedBy { it.name.lowercase() }
+        if (!javaFiles.isNullOrEmpty()) {
+            val dirs = javaFiles.filter { it.isDirectory }.sortedBy { it.name.lowercase() }
+            if (dirs.isNotEmpty()) {
+                return@withContext dirs
+            }
         }
 
         if (isRootGranted()) {
-            val sanitized = path.trimEnd('/')
+            val sanitized = if (path == "/" || path.isBlank()) "" else path.trimEnd('/')
             val result = Shell.cmd("ls -1A -F \"$sanitized/\"").exec()
             val outputList: List<String> = result.out
             val subDirs = mutableListOf<File>()
             for (line in outputList) {
-                if (line.endsWith("/")) {
-                    val folderName = line.trimEnd('/')
-                    if (folderName.isNotBlank()) {
+                val trimmed = line.trim()
+                if (trimmed.endsWith("/") || trimmed.endsWith("/@")) {
+                    val folderName = trimmed.removeSuffix("/@").removeSuffix("/").trim()
+                    if (folderName.isNotBlank() && folderName != "." && folderName != "..") {
                         subDirs.add(File(dir, folderName))
                     }
                 }
             }
             if (subDirs.isNotEmpty()) {
-                return@withContext subDirs.sortedBy { it.name.lowercase() }
+                return@withContext subDirs.distinctBy { it.absolutePath }.sortedBy { it.name.lowercase() }
             }
         }
 
