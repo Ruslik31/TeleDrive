@@ -28,6 +28,7 @@ import com.drdisagree.teledrive.presentation.common.openLink
 import com.drdisagree.teledrive.presentation.common.shareLocalFiles
 import com.drdisagree.teledrive.presentation.components.FileSystemFolderPickerDialog
 import com.drdisagree.teledrive.presentation.components.LocalFolderItem
+import com.drdisagree.teledrive.presentation.theme.TeleDriveTheme
 import com.drdisagree.teledrive.presentation.platform.LocalRootHandler
 import com.drdisagree.teledrive.presentation.platform.RootHandler
 import org.koin.compose.koinInject
@@ -186,29 +187,31 @@ fun ProvidePlatformActions(content: @Composable () -> Unit) {
         content()
 
         activeFolderPickerCallback?.let { callback ->
-            FileSystemFolderPickerDialog(
-                initialPath = "/storage/emulated/0",
-                listSubfolders = { path ->
-                    RootUtil.listDirectories(path).map { LocalFolderItem(it.name, it.absolutePath) }
-                },
-                createSubfolder = { parentPath, name ->
-                    runCatching { File(parentPath, name).mkdir() }.getOrDefault(false)
-                },
-                onUseSaf = {
-                    val cb = callback
-                    activeFolderPickerCallback = null
-                    folderCallback.arm(cb)
-                    folderLauncher.launch(null)
-                },
-                onConfirm = { path ->
-                    activeFolderPickerCallback = null
-                    callback(PickResult.Picked(path))
-                },
-                onDismiss = {
-                    activeFolderPickerCallback = null
-                    callback(PickResult.Canceled)
-                }
-            )
+            TeleDriveTheme {
+                FileSystemFolderPickerDialog(
+                    initialPath = "/storage/emulated/0",
+                    listSubfolders = { path ->
+                        RootUtil.listDirectories(path).map { LocalFolderItem(it.name, it.absolutePath) }
+                    },
+                    createSubfolder = { parentPath, name ->
+                        runCatching { File(parentPath, name).mkdir() }.getOrDefault(false)
+                    },
+                    onUseSaf = {
+                        val cb = callback
+                        activeFolderPickerCallback = null
+                        folderCallback.arm(cb)
+                        folderLauncher.launch(null)
+                    },
+                    onConfirm = { path ->
+                        activeFolderPickerCallback = null
+                        callback(PickResult.Picked(path))
+                    },
+                    onDismiss = {
+                        activeFolderPickerCallback = null
+                        callback(PickResult.Canceled)
+                    }
+                )
+            }
         }
     }
 }

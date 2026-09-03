@@ -106,6 +106,9 @@ fun FileSystemFolderPickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (parentPath != null && currentPath != "/") {
@@ -248,6 +251,9 @@ fun FileSystemFolderPickerDialog(
         var name by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { naming = false },
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             title = { Text(stringResource(Res.string.files_new_folder)) },
             text = {
                 OutlinedTextField(
