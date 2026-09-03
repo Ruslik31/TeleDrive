@@ -143,6 +143,8 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.documentfile)
     implementation(libs.androidx.exifinterface)
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.service)
     implementation(libs.zip4j)
     implementation(libs.zxing.core)
     implementation(libs.tdlib)

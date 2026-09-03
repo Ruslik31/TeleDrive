@@ -23,6 +23,7 @@ dependencyResolutionManagement {
         maven("https://jitpack.io") {
             content {
                 includeGroup("com.github.tdlibx")
+                includeGroup("com.github.topjohnwu.libsu")
             }
         }
         maven("https://mvn.mchv.eu/repository/mchv/") {

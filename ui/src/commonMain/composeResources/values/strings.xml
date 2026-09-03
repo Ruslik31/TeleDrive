@@ -775,6 +775,19 @@
     <string name="permissions_allowed">Allowed</string>
     <string name="permissions_not_allowed">Not allowed</string>
     <string name="permissions_not_allowed_optional">Not allowed, optional</string>
+    <string name="permission_root_title">Root access</string>
+    <string name="permission_root_rationale">Allows full access to system root / and system permissions</string>
+    <string name="permissions_grant_via_root">Grant all permissions via Root</string>
+    <string name="permissions_grant_via_root_summary">Use Root privileges to grant storage and notification permissions</string>
+    <string name="permissions_root_granted">Root access is granted</string>
+    <string name="permissions_root_not_granted">Root access is not granted</string>
+    <string name="permissions_grant_root_success">All permissions granted via Root</string>
+    <string name="permissions_grant_root_failed">Failed to grant permissions via Root</string>
+    <string name="picker_system_root">System Root (/)</string>
+    <string name="picker_internal_storage">Internal Storage</string>
+    <string name="picker_use_saf">Use System SAF Picker</string>
+    <string name="picker_select_this_folder">Select this folder</string>
+    <string name="picker_title_select_folder">Select Folder</string>
 
     <!-- About -->
     <string name="about_auto_check">Check automatically</string>

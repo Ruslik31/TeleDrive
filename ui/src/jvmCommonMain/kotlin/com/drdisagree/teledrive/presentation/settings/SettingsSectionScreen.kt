@@ -166,6 +166,7 @@ import com.drdisagree.teledrive.resources.settings_download_location_reset
 import com.drdisagree.teledrive.resources.settings_free_up_none
 import com.drdisagree.teledrive.resources.settings_free_up_subtitle
 import com.drdisagree.teledrive.presentation.platform.LocalDeleteConsentLauncher
+import com.drdisagree.teledrive.presentation.platform.LocalRootHandler
 import com.drdisagree.teledrive.presentation.platform.LocalStandardFolders
 import com.drdisagree.teledrive.presentation.platform.LocalDeviceOwnerGate
 import com.drdisagree.teledrive.presentation.platform.LocalFolderPicker
@@ -258,8 +259,14 @@ fun SettingsSectionScreen(
                     onClearCache = { confirmClearCache = true }
                 )
 
-                SettingsSectionType.PERMISSIONS ->
-                    PermissionsSection(viewModel.permissionChecker)
+                SettingsSectionType.PERMISSIONS -> {
+                    val rootHandler = LocalRootHandler.current
+                    PermissionsSection(
+                        permissionChecker = viewModel.permissionChecker,
+                        onRequestRoot = rootHandler::requestRoot,
+                        onGrantAllViaRoot = rootHandler::grantAllPermissionsViaRoot
+                    )
+                }
 
                 SettingsSectionType.SECURITY -> SecuritySection(state, viewModel)
                 SettingsSectionType.APPEARANCE -> AppearanceSection(state, viewModel)

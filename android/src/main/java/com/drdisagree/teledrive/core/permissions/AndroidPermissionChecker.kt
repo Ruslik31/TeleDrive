@@ -5,12 +5,14 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.ContextCompat
+import com.drdisagree.teledrive.core.root.RootUtil
 
 class AndroidPermissionChecker(
     private val context: Context
 ) : PermissionChecker {
 
     override fun isGranted(permission: AppPermission): Boolean = when {
+        permission.isRootAccess -> RootUtil.isRootGranted()
         permission.isSpecialAccess -> hasAllFilesAccess()
         else -> permission.manifestPermission?.let {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
@@ -28,5 +30,5 @@ class AndroidPermissionChecker(
         AppPermission.entries.filter { it.critical && !isGranted(it) }
 
     override fun isRequestable(permission: AppPermission): Boolean =
-        permission.manifestPermission != null || permission.isSpecialAccess
+        permission.manifestPermission != null || permission.isSpecialAccess || permission.isRootAccess
 }

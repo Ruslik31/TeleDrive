@@ -7,6 +7,8 @@ import com.drdisagree.teledrive.resources.permission_notifications_rationale
 import com.drdisagree.teledrive.resources.permission_notifications_title
 import com.drdisagree.teledrive.resources.permission_photos_rationale
 import com.drdisagree.teledrive.resources.permission_photos_title
+import com.drdisagree.teledrive.resources.permission_root_rationale
+import com.drdisagree.teledrive.resources.permission_root_title
 import com.drdisagree.teledrive.resources.permission_videos_rationale
 import com.drdisagree.teledrive.resources.permission_videos_title
 import org.jetbrains.compose.resources.StringResource
@@ -39,8 +41,15 @@ enum class AppPermission(
         titleRes = Res.string.permission_all_files_title,
         rationaleRes = Res.string.permission_all_files_rationale,
         critical = true
+    ),
+    ROOT_ACCESS(
+        titleRes = Res.string.permission_root_title,
+        rationaleRes = Res.string.permission_root_rationale,
+        critical = false
     );
 
     /** Special access granted from a system settings screen, not a dialog. */
     val isSpecialAccess: Boolean get() = this == ALL_FILES
+
+    val isRootAccess: Boolean get() = this == ROOT_ACCESS
 }

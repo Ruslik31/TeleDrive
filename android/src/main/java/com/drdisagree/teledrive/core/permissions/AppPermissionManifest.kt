@@ -28,4 +28,5 @@ val AppPermission.manifestPermission: String?
             }
 
         AppPermission.ALL_FILES -> null
+        AppPermission.ROOT_ACCESS -> null
     }

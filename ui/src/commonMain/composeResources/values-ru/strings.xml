@@ -797,6 +797,19 @@
     <string name="permissions_allowed">Разрешено</string>
     <string name="permissions_not_allowed">Запрещено</string>
     <string name="permissions_not_allowed_optional">Запрещено, необязательно</string>
+    <string name="permission_root_title">Рут-права (Root)</string>
+    <string name="permission_root_rationale">Предоставляет полный доступ к корню системы / и разрешениям</string>
+    <string name="permissions_grant_via_root">Выдать все разрешения через Root</string>
+    <string name="permissions_grant_via_root_summary">Использовать Root-права для выдачи всех разрешений памяти и уведомлений</string>
+    <string name="permissions_root_granted">Рут-права предоставлены</string>
+    <string name="permissions_root_not_granted">Рут-права не предоставлены</string>
+    <string name="permissions_grant_root_success">Все разрешения успешно выданы через Root</string>
+    <string name="permissions_grant_root_failed">Не удалось выдать разрешения через Root</string>
+    <string name="picker_system_root">Корень системы (/)</string>
+    <string name="picker_internal_storage">Внутренняя память</string>
+    <string name="picker_use_saf">Использовать системный SAF</string>
+    <string name="picker_select_this_folder">Выбрать эту папку</string>
+    <string name="picker_title_select_folder">Выберите папку</string>
 
     <!-- About -->
     <string name="about_auto_check">Автопроверка</string>
