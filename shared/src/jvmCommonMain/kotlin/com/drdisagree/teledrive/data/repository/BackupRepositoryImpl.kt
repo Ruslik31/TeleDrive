@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.File
 import java.util.UUID
+import kotlin.io.OnErrorAction
 
 class BackupRepositoryImpl(
     private val backupDao: BackupDao,
@@ -88,6 +89,10 @@ class BackupRepositoryImpl(
             val root = File(folderPath)
             if (!root.exists()) continue
             root.walkTopDown()
+                .onFail { file, e ->
+                    SafeLog.w(TAG, "Skipping inaccessible path during backup scan: ${file.absolutePath}", e)
+                    OnErrorAction.entries.first { it != OnErrorAction.TERMINATE }
+                }
                 .onEnter { dir -> dir == root || !skipHidden || !isHiddenName(dir) }
                 .filter { it.isFile && it.length() > 0 }
                 .forEach { candidates.add(it) }
