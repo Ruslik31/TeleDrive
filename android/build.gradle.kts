@@ -32,9 +32,10 @@ android {
     }
 
     val ciKeystore = System.getenv("KEYSTORE_FILE")?.takeIf { it.isNotBlank() }
+    val isKeystoreValid = ciKeystore != null && file(ciKeystore).run { exists() && length() > 0L }
     signingConfigs {
         create("release") {
-            if (ciKeystore != null) {
+            if (isKeystoreValid) {
                 storeFile = file(ciKeystore)
                 storePassword = System.getenv("KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("KEY_ALIAS")
@@ -44,7 +45,7 @@ android {
     }
     buildTypes {
         debug {
-            if (ciKeystore != null) {
+            if (isKeystoreValid) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
@@ -55,7 +56,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            if (ciKeystore != null) {
+            if (isKeystoreValid) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }

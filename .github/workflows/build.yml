@@ -37,16 +37,28 @@ jobs:
       - name: Unit tests
         run: ./gradlew testDebugUnitTest
 
-      - name: Decode keystore
+      - name: Setup keystore
         if: ${{ github.event_name != 'pull_request' }}
-        run: echo "${{ secrets.KEYSTORE }}" | base64 -d > "$RUNNER_TEMP/keystore.jks"
+        run: |
+          if [ -n "${{ secrets.KEYSTORE }}" ]; then
+            echo "${{ secrets.KEYSTORE }}" | base64 -d > "$RUNNER_TEMP/keystore.jks"
+            echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+          else
+            keytool -genkeypair -v \
+              -keystore "$RUNNER_TEMP/keystore.jks" \
+              -alias ruslik31 \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass teledrive -keypass teledrive \
+              -dname "CN=Ruslik31, OU=TeleDrive, O=TeleDrive, L=City, ST=State, C=US"
+            echo "KEYSTORE_PASSWORD=teledrive" >> $GITHUB_ENV
+            echo "KEY_ALIAS=ruslik31" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=teledrive" >> $GITHUB_ENV
+          fi
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/keystore.jks" >> $GITHUB_ENV
 
       - name: Assemble debug APKs
-        env:
-          KEYSTORE_FILE: ${{ github.event_name != 'pull_request' && format('{0}/keystore.jks', runner.temp) || '' }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew :android:assembleDebug
 
       - uses: actions/upload-artifact@v4

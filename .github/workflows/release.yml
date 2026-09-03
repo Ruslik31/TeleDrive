@@ -19,15 +19,27 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE }}" | base64 -d > "$RUNNER_TEMP/keystore.jks"
+      - name: Setup keystore
+        run: |
+          if [ -n "${{ secrets.KEYSTORE }}" ]; then
+            echo "${{ secrets.KEYSTORE }}" | base64 -d > "$RUNNER_TEMP/keystore.jks"
+            echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+          else
+            keytool -genkeypair -v \
+              -keystore "$RUNNER_TEMP/keystore.jks" \
+              -alias ruslik31 \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass teledrive -keypass teledrive \
+              -dname "CN=Ruslik31, OU=TeleDrive, O=TeleDrive, L=City, ST=State, C=US"
+            echo "KEYSTORE_PASSWORD=teledrive" >> $GITHUB_ENV
+            echo "KEY_ALIAS=ruslik31" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=teledrive" >> $GITHUB_ENV
+          fi
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/keystore.jks" >> $GITHUB_ENV
 
       - name: Assemble signed release APKs
-        env:
-          KEYSTORE_FILE: ${{ runner.temp }}/keystore.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew :android:assembleRelease
 
       - uses: actions/upload-artifact@v4
