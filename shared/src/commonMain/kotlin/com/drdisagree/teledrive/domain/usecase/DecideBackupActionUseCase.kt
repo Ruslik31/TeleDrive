@@ -5,7 +5,7 @@ import com.drdisagree.teledrive.domain.model.Exclusion
 
 /**
  * Incremental backup decision for a single candidate file. Change detection
- * uses size + mtime first and falls back to the content hash when only the
+ * uses size + mtime first and falls back to the content hash when size or
  * mtime changed, so touched-but-identical files are not re-uploaded.
  */
 class DecideBackupActionUseCase(
@@ -34,9 +34,7 @@ class DecideBackupActionUseCase(
                     existingRecord.modifiedAt == modifiedAt
             if (sameSizeAndTime) return BackupDecision.SKIP_UNCHANGED
 
-            if (existingRecord.sizeBytes == candidate.sizeBytes &&
-                existingRecord.contentHash != null
-            ) {
+            if (existingRecord.contentHash != null) {
                 val currentHash = contentHashProvider()
                 if (currentHash != null && currentHash == existingRecord.contentHash) {
                     return BackupDecision.SKIP_UNCHANGED

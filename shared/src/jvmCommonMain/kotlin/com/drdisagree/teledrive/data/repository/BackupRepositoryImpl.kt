@@ -103,6 +103,12 @@ class BackupRepositoryImpl(
         val reasons = mutableMapOf<BackupDecision, Int>()
         val toBackup = mutableListOf<File>()
         for (candidate in candidates) {
+            if (isTemporaryOrCacheFile(candidate.name, candidate.absolutePath)) {
+                skipped++
+                reasons[BackupDecision.SKIP_EXCLUDED] = (reasons[BackupDecision.SKIP_EXCLUDED] ?: 0) + 1
+                continue
+            }
+
             if (backupDao.recordByPath(candidate.absolutePath) == null &&
                 (adoptLinkedUpload(candidate) ||
                         reviveTrashedUpload(candidate) ||
@@ -113,6 +119,7 @@ class BackupRepositoryImpl(
             }
             val record = backupDao.recordByPath(candidate.absolutePath)
             val mime = MimeTypes.fromFileName(candidate.name)
+            var calculatedHash: String? = null
             val decision = decideBackupAction(
                 candidate = EvaluateExclusionsUseCase.Candidate(
                     absolutePath = candidate.absolutePath,
@@ -128,12 +135,27 @@ class BackupRepositoryImpl(
                 },
                 exclusions = exclusions,
                 maxFileSizeBytes = maxSizeBytes,
-                contentHashProvider = { Hashing.sha256(candidate) }
+                contentHashProvider = {
+                    calculatedHash = Hashing.sha256(candidate)
+                    calculatedHash
+                }
             )
             if (decision == BackupDecision.BACKUP) {
                 toBackup.add(candidate)
                 totalBytes += candidate.length()
             } else {
+                if (decision == BackupDecision.SKIP_UNCHANGED && record != null) {
+                    val hashToStore = calculatedHash ?: record.contentHash ?: Hashing.sha256(candidate)
+                    if (record.modifiedAt != candidate.lastModified() || record.sizeBytes != candidate.length() || record.contentHash != hashToStore) {
+                        backupDao.upsertRecord(
+                            record.copy(
+                                sizeBytes = candidate.length(),
+                                modifiedAt = candidate.lastModified(),
+                                contentHash = hashToStore
+                            )
+                        )
+                    }
+                }
                 skipped++
                 reasons[decision] = (reasons[decision] ?: 0) + 1
             }
@@ -260,7 +282,16 @@ class BackupRepositoryImpl(
         folderId: String?,
         chatId: Long?
     ): String {
-        fileDao.byLocalPath(source.absolutePath)?.let { return it.id }
+        val existing = fileDao.byLocalPath(source.absolutePath)
+        if (existing != null) {
+            fileDao.upsert(
+                existing.copy(
+                    sizeBytes = source.length(),
+                    modifiedAt = source.lastModified()
+                )
+            )
+            return existing.id
+        }
 
         val mime = MimeTypes.fromFileName(source.name)
         val media = mediaMetadataExtractor.extract(source, mime)
@@ -364,6 +395,21 @@ class BackupRepositoryImpl(
      * contents are worth keeping, so it excludes nothing but itself.
      */
     private fun isHiddenName(file: File): Boolean = file.name.startsWith('.')
+
+    private fun isTemporaryOrCacheFile(name: String, absolutePath: String): Boolean {
+        val lowerName = name.lowercase()
+        val lowerPath = absolutePath.lowercase().replace('\\', '/')
+        return lowerName.endsWith(".tmp") ||
+                lowerName.endsWith(".cache") ||
+                lowerName.endsWith(".log") ||
+                lowerName.endsWith(".db-journal") ||
+                lowerName.endsWith(".tmp.nomedia") ||
+                lowerName == "cloud_discovered_cache.json" ||
+                lowerPath.contains("/.cache/") ||
+                lowerPath.contains("/cache/") ||
+                lowerPath.contains("/app_webview/") ||
+                lowerPath.contains("/code_cache/")
+    }
 
     companion object {
         private const val TAG = "BackupRepository"

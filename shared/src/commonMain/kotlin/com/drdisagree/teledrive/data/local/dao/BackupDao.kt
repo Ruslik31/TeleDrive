@@ -54,8 +54,8 @@ interface BackupDao {
 
     @Query(
         """DELETE FROM backup_records
-           WHERE fileId IS NULL
-              OR fileId NOT IN (SELECT id FROM files WHERE messageId IS NOT NULL)"""
+           WHERE fileId IS NOT NULL
+             AND fileId NOT IN (SELECT id FROM files)"""
     )
     suspend fun deleteOrphanedRecords(): Int
 }
